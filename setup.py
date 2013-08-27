@@ -27,6 +27,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'sqlalchemy',
+        'mechanize',
     ],
     extras_require=dict(
         test=['mock',
