@@ -27,10 +27,17 @@ setup(
     zip_safe=False,
     install_requires=[
         'sqlalchemy',
-        'mechanize',
+        'Ghost.py',
     ],
     extras_require=dict(
         test=['mock',
+              'flask',
               ]
     ),
+    entry_points={
+        'console_scripts': [
+            'fundscout = fundscout.commandline:client',
+            'testserver = fundscout.tests.app:run_server',
+        ]
+    }
 )
