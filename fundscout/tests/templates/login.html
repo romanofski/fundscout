@@ -1,24 +1,18 @@
-<!DOCTYPE html>
-<html>
-    <body>
-        <h1>Login Form</h1>
-        {% if error %}
-        <div class="error">
-            {{ error }}
-        </div>
-        {% endif %}
-        <form id="loginForm" action="" method="post">
-            <fieldset>
-                <p>
-                    <label for="text">User</label>
-                    <input type="TEXT" id="text" name="user" />
-                </p>
-                <p>
-                    <label for="text">Password</label>
-                    <input type="Password" id="text" name="password" />
-                </p>
-                <input type="submit" value="Login" />
-            </fieldset>
-        </form>
-    </body>
+{% extends "layout.html" %}
+{% block body %}
+<form id="loginForm" action="" method="post">
+    <fieldset>
+        <p>
+        <label for="text">User</label>
+        <input type="TEXT" id="text" name="user" />
+        </p>
+        <p>
+        <label for="text">Password</label>
+        <input type="Password" id="text" name="password" />
+        </p>
+        <input type="submit" value="Login" />
+    </fieldset>
+</form>
+</body>
 </html>
+{% endblock %}

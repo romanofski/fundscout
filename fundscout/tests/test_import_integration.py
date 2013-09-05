@@ -13,4 +13,4 @@ class TestDownloadCSV(unittest.TestCase):
         step = fundscout.importer.config.open([url])
         browser = ghost.Ghost()
         page, resources = step(browser)
-        self.assertTrue('Login Form' in browser.content)
+        self.assertTrue('User' in browser.content)
