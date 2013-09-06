@@ -1,9 +1,10 @@
-import os
 from flask import Flask
+from flask import Response
+from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
-from flask import redirect
+import os
 
 
 app = Flask(__name__)
@@ -22,6 +23,11 @@ def login():
 
 @app.route('/download', methods=['GET', 'POST'])
 def download():
+    def generate():
+        for i in range(1,100):
+            yield ','.join(['foo', 'bar', 'baz', str(i)]) + '\n'
+    if request.method == 'POST':
+        return Response(generate(), mimetype='text/csv')
     return render_template('download.html')
 
 
