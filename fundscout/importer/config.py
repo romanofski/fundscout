@@ -1,5 +1,6 @@
 import ConfigParser as configparser
 import fundscout.importer.config
+import re
 import ghost
 
 
@@ -10,11 +11,16 @@ def lex_config(fp):
     >>> import StringIO
     >>> len(lex_config(StringIO.StringIO('invalid')))
     0
-    >>> result = lex_config(StringIO.StringIO('open "http://foobar"'))
+    >>> result = lex_config(StringIO.StringIO('open http://foobar'))
     >>> len(result)
     1
     >>> result[0].url
     'http://foobar'
+    >>> result = lex_config(StringIO.StringIO('click h1 span a'))
+    >>> len(result)
+    1
+    >>> result[0].selector
+    'h1 span a'
     >>> len(lex_config(StringIO.StringIO('open "http://foobar"\\nclick "selector"')))
     2
    """
@@ -22,11 +28,13 @@ def lex_config(fp):
     data = []
     klass = None
     for line in fp:
-        commands = line.strip().split(' ')
-        token = commands[0]
-        klass = getattr(fundscout.importer.config, token, None)
+        try:
+            command, data = line.strip().split(' ', 1)
+        except ValueError:
+            continue
+        klass = getattr(fundscout.importer.config, command, None)
         if klass is not None:
-            result.append(klass(commands[1:]))
+            result.append(klass(data))
 
     return result
 
@@ -60,8 +68,8 @@ class BaseStatement(object):
 class open(BaseStatement):
     """ opens a URL """
 
-    def prepare(self, tokens):
-        self.url = tokens[0].strip('"')
+    def prepare(self, url):
+        self.url = url
 
     def __call__(self, browser):
         return browser.open(self.url)
@@ -70,20 +78,18 @@ class open(BaseStatement):
 class fill(BaseStatement):
     """ fills a form with given mapping.
 
-    >>> obj = fill(['form select', 'key:value,', ' frob:value'])
+    >>> obj = fill('"h2 span a" key:value, key2:value2, key3:value')
     >>> obj.selector
-    'form select'
-    >>> obj.data['frob']
-    'value'
+    'h2 span a'
     >>> obj.data['key']
     'value'
+    >>> obj.data['key2']
+    'value2'
     """
 
-    def prepare(self, tokens):
-        self.selector = tokens[0]
-        self.data = {}
-        for t in tokens[1:]:
-            self.data.update(dict([t.strip(',').strip().split(':')]))
+    def prepare(self, line):
+        _, self.selector, self.data = re.split('"', line)
+        self.data = dict([x.strip().split(':') for x in self.data.split(',')])
 
     def __call__(self, browser):
         browser.fill(self.selector, self.data)
@@ -93,18 +99,18 @@ class fill(BaseStatement):
 class click(BaseStatement):
     """ Clicks a link based on a selector."""
 
-    def prepare(self, tokens):
-        self.urls = tokens
+    def prepare(self, selector):
+        self.selector = selector
 
     def __call__(self, browser):
-        pass
+        return browser.click(self.selector)
 
 
 class debug(BaseStatement):
     """capture the viewport"""
 
-    def prepare(self, tokens):
-        self.filepath = tokens[0]
+    def prepare(self, path):
+        self.filepath = path
 
     def __call__(self, browser):
-        browser.capture_to(self.filepath)
+        return browser.capture_to(self.filepath)
