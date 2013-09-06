@@ -1,7 +1,6 @@
 import ConfigParser as configparser
 import fundscout.importer.config
 import ghost
-import shlex
 
 
 def lex_config(fp):
@@ -19,28 +18,15 @@ def lex_config(fp):
     >>> len(lex_config(StringIO.StringIO('open "http://foobar"\\nclick "selector"')))
     2
    """
-    lexer = shlex.shlex(fp)
     result = []
     data = []
     klass = None
-    while True:
-        token = lexer.get_token()
-        if hasattr(fundscout.importer.config, token):
-            #
-            # TODO: We can do better
-            #
-            if klass is not None:
-                result.append(klass(data))
-                data = []
-            klass = getattr(fundscout.importer.config, token, None)
-        elif klass is not None and token:
-            data.append(token)
-
-        if not token:
-            if klass is not None:
-                result.append(klass(data))
-                data = []
-            break
+    for line in fp:
+        commands = line.strip().split(' ')
+        token = commands[0]
+        klass = getattr(fundscout.importer.config, token, None)
+        if klass is not None:
+            result.append(klass(commands[1:]))
 
     return result
 
