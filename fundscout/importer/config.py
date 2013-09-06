@@ -70,7 +70,7 @@ class open(BaseStatement):
 class fill(BaseStatement):
     """ fills a form with given mapping.
 
-    >>> obj = fill(['"form select"', '"key:value, frob:value"'])
+    >>> obj = fill(['form select', 'key:value,', ' frob:value'])
     >>> obj.selector
     'form select'
     >>> obj.data['frob']
@@ -80,9 +80,10 @@ class fill(BaseStatement):
     """
 
     def prepare(self, tokens):
-        self.selector, self.data = [x.strip('"') for x in tokens]
-        self.data = self.data.split(',')
-        self.data = dict([x.strip().split(':') for x in self.data])
+        self.selector = tokens[0]
+        self.data = {}
+        for t in tokens[1:]:
+            self.data.update(dict([t.strip(',').strip().split(':')]))
 
     def __call__(self, browser):
         browser.fill(self.selector, self.data)
@@ -97,3 +98,13 @@ class click(BaseStatement):
 
     def __call__(self, browser):
         pass
+
+
+class debug(BaseStatement):
+    """capture the viewport"""
+
+    def prepare(self, tokens):
+        self.filepath = tokens[0]
+
+    def __call__(self, browser):
+        browser.capture_to(self.filepath)
