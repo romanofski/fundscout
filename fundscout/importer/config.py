@@ -114,3 +114,15 @@ class debug(BaseStatement):
 
     def __call__(self, browser):
         return browser.capture_to(self.filepath)
+
+
+class validate(BaseStatement):
+    """Raise an AssertionError if the given CSS3 selector does not
+       match.
+    """
+
+    def prepare(self, selector):
+        self.selector = selector.strip('"')
+
+    def __call__(self, browser):
+        assert browser.exists(self.selector)

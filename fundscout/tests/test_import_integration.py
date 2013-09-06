@@ -13,7 +13,7 @@ class TestDownloadCSV(unittest.TestCase):
         self.config = StringIO.StringIO("""
         open http://127.0.0.1:5000/
         fill "form" user:123456, password:1234566
-        debug /tmp/foo.png
+        validate "h1"
         """)
 
     def test_login_and_download(self):
