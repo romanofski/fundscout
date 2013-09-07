@@ -40,6 +40,24 @@ def lex_config(fp):
 
 
 def configure_and_run(configuration):
+    """Reads the configuration to download the CSV from an Account.
+
+    The configuration follows the conventions of the ConfigParser
+    module.
+
+    Example:
+
+        [fundscout]
+        accounts = FirstAccount
+
+        [FirstAccount]
+        steps = open http://localhost:5000
+                click "h1 span a"
+                fill "form" "inputname:value, inputname2:value"
+                expect "span p"
+                debug /tmp/foo.png
+
+    """
     config = configparser.SafeConfigParser()
     config.read(configuration)
     try:
