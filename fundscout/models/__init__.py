@@ -2,12 +2,23 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import String
+from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.orm
 
 
 Base = declarative_base()
 Session = sqlalchemy.orm.sessionmaker()
+
+
+class Currency(Base):
+    __tablename__ = 'currency'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    isoname = Column(String(3))
+
+    transaction_id = Column(Integer, ForeignKey('bankaccount.id'))
 
 
 class Transaction(Base):
@@ -19,9 +30,12 @@ class Transaction(Base):
     amount = Column(Numeric)
 
 
-class Account(Base):
+
+class BankAccount(Base):
     """A bank account"""
-    __tablename__ = 'account'
+    __tablename__ = 'bankaccount'
 
     id = Column(Integer, primary_key=True)
     description = Column(String)
+    currency = sqlalchemy.orm.relationship(
+        'Currency', uselist=False, backref='bankaccount')
