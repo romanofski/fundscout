@@ -116,7 +116,7 @@ class debug(BaseStatement):
         return browser.capture_to(self.filepath)
 
 
-class validate(BaseStatement):
+class expect(BaseStatement):
     """Raise an AssertionError if the given CSS3 selector does not
        match.
     """
