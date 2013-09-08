@@ -29,12 +29,24 @@ class TestAccountFunctional(unittest.TestCase):
 
     def test_import_rollback_batch(self):
         session = Session()
+
+        #
+        # We split up two transactions into two batches. At some point
+        # we figure out, that the last batch was faulty and revert it.
+        #
         account = BankAccount(description='Test Description',
                               currency=session.query(Currency).first())
-        transactions = [
+        b1 = [
             FundTransaction(description='first', amount=-2.30),
+        ]
+        b2 = [
             FundTransaction(description='second', amount=10.02),
         ]
-        account.import_transactions(transactions)
+        account.import_transactions(b1)
+        account.import_transactions(b2)
+        session.flush()
 
+        self.assertEqual(2, len(account.import_batches))
+
+        account.rollback_batch(2)
         self.assertEqual(1, len(account.import_batches))

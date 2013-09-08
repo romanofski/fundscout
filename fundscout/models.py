@@ -1,7 +1,7 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
-from sqlalchemy import Date
+from sqlalchemy import DateTime
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
@@ -28,7 +28,8 @@ class ImportBatch(Base):
     __tablename__ = 'importbatch'
 
     id = Column(Integer, primary_key=True)
-    import_date = Column(Date, default=datetime.date.today())
+    import_date = Column(DateTime, default=datetime.datetime.utcnow,
+                         nullable=False)
     bank_account_id = Column(Integer, ForeignKey('bankaccount.id'))
 
     transactions = sqlalchemy.orm.relationship(
@@ -66,3 +67,9 @@ class BankAccount(Base):
         """
         batch = ImportBatch(transactions=list_of_transactions)
         self.import_batches.append(batch)
+
+    def rollback_batch(self, batchid):
+        # TODO: Better lookup needed
+        for batch in self.import_batches:
+            if batchid == batch.id:
+                del self.import_batches[self.import_batches.index(batch)]
