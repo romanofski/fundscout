@@ -10,14 +10,14 @@ import time
 class SQLLayer(object):
 
     @classmethod
-    def setUp(cls):
+    def testSetUp(cls):
         engine = sqlalchemy.create_engine('sqlite:///:memory:')
         Base.metadata.bind = engine
         Base.metadata.create_all(engine)
         Session.configure(bind=engine)
 
     @classmethod
-    def tearDown(cls):
+    def testTearDown(cls):
         Base.metadata.drop_all()
 
 
