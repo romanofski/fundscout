@@ -1,7 +1,8 @@
 from fundscout.models import BankAccount
 from fundscout.models import Currency
-from fundscout.models import Session
 from fundscout.models import FundTransaction
+from fundscout.models import Session
+import datetime
 import fundscout
 import fundscout.testing
 import unittest
@@ -19,7 +20,7 @@ class TestAccountFunctional(unittest.TestCase):
     def test_create(self):
         session = Session()
         session.add(
-            BankAccount(description='Test Description',
+            BankAccount(name='ANZ', description='Test Description',
                         currency=session.query(Currency).first())
         )
 
@@ -37,10 +38,12 @@ class TestAccountFunctional(unittest.TestCase):
         account = BankAccount(description='Test Description',
                               currency=session.query(Currency).first())
         b1 = [
-            FundTransaction(description='first', amount=-2.30),
+            FundTransaction(description='first', amount=-2.30,
+                            effective=datetime.date.today()),
         ]
         b2 = [
-            FundTransaction(description='second', amount=10.02),
+            FundTransaction(description='second', amount=10.02,
+                            effective=datetime.date.today()),
         ]
         account.import_transactions(b1)
         account.import_transactions(b2)

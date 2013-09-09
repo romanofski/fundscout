@@ -2,6 +2,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import DateTime
+from sqlalchemy import Date
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
@@ -41,8 +42,9 @@ class FundTransaction(Base):
     __tablename__ = 'transaction'
 
     id = Column(Integer, primary_key=True)
-    description = Column(String)
-    amount = Column(Numeric)
+    description = Column(String, nullable=False)
+    amount = Column(Numeric, nullable=False)
+    effective = Column(Date, nullable=False)
 
     import_batch_id = Column(Integer, ForeignKey('importbatch.id'))
 
@@ -52,6 +54,7 @@ class BankAccount(Base):
     __tablename__ = 'bankaccount'
 
     id = Column(Integer, primary_key=True)
+    name = Column(String)
     description = Column(String)
     currency = sqlalchemy.orm.relationship(
         'Currency', uselist=False, backref='bankaccount')
