@@ -1,10 +1,15 @@
+from fundscout.models import Base
+from fundscout.models import Session
 import argparse
 import fundscout
 import fundscout.importer.config
 import getpass
 import os
 import os.path
+import sqlalchemy
 import sys
+import urllib
+import urlparse
 
 
 def _setup_commandline_arguments():
@@ -20,11 +25,16 @@ def _setup_commandline_arguments():
               " one is created."
               ),
         type=str,
-        default=os.path.join(os.path.abspath(os.getcwd()), 'fundscout.sqlite')
+        default='sqlite:///' + os.path.join(os.path.abspath(os.getcwd()), 'fundscout.sqlite')
     )
     parser.add_argument(
         "--config",
         help=("Path to configuration file for importing."),
+        type=str
+    )
+    parser.add_argument(
+        "--csv",
+        help=("Path to a csv file for importing."),
         type=str
     )
     return parser
@@ -35,7 +45,15 @@ def client():
     parser = _setup_commandline_arguments()
     arguments = parser.parse_args()
 
+    engine = sqlalchemy.create_engine(arguments.database)
+    Base.metadata.bind = engine
+    Base.metadata.create_all(engine)
+    Session.configure(bind=engine)
+
     if arguments.config and os.path.exists(arguments.config):
         fundscout.importer.config.configure_and_run(arguments.config)
+
+    if arguments.csv and os.path.exists(arguments.csv):
+        fundscout.importer.import_csv(arguments.csv)
 
     sys.exit(0)

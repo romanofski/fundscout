@@ -1,7 +1,13 @@
+from fundscout.importer import import_csv
+from fundscout.models import FundTransaction
+from fundscout.models import ImportBatch
+from fundscout.models import Session
 from fundscout.testing import IntegrationLayer
+from fundscout.testing import SQLLayer
 import StringIO
 import fundscout.importer.config
 import ghost
+import os.path
 import unittest
 
 
@@ -17,9 +23,23 @@ class TestDownloadCSV(unittest.TestCase):
         fill "form" daterange:1
         """)
 
-    def test_login_and_download(self):
+    def test_login_and_download_csv(self):
         steps = fundscout.importer.config.lex_config(self.config)
         browser = ghost.Ghost()
         for s in steps:
             result = s(browser)
         assert 'foo,bar' in browser.content
+
+
+class TestImportCSV(unittest.TestCase):
+
+    layer = SQLLayer
+
+    def test_import_csv(self):
+        csvfile = os.path.join(os.path.dirname(__file__),
+                               'testdata', 'anzexport.csv')
+        import_csv(csvfile)
+
+        session = Session()
+        self.assertEqual(1, session.query(ImportBatch).count())
+        self.assertEqual(4, session.query(FundTransaction).count())
