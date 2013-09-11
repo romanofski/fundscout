@@ -23,8 +23,12 @@ large or small they might be).
 Prerequites
 -----------
 
-    * Ghost.py (https://github.com/jeanphix/Ghost.py) > 0.1b2
-    * PySide
+* Ghost.py (https://github.com/jeanphix/Ghost.py) > 0.1b2
+* PySide
+    - on Debian, install: `apt-get build-dep python-pyside`
+    - on Fedora, install: `yum-builddep python-pyside`. In case you run
+      into errors that qmake can't be found, create a link to the
+      executable: `sudo ln -s /usr/bin/qmake-qt4 /usr/bin/qmake`
 
 Development Sandbox
 -------------------
@@ -32,14 +36,16 @@ Development Sandbox
 Create a virtualenv first and use python2.7:
 
     virtualenv ~/tools/python2.7
-    
-Install PySide in the virtualenv as outlined in the [pyside_setup guide](https://github.com/PySide/pyside-setup). Make sure you run the pyside_postinstall.py script after the installation if needed.
+
+Install PySide in the virtualenv as outlined in the [pyside_setup
+guide](https://github.com/PySide/pyside-setup). Make sure you run the
+pyside_postinstall.py script after the installation if needed.
 
 Run the usual buildout procedure:
 
     ~/tools/python2.7/bin/python bootstrap.py
     bin/buildout -N
-    
+
 Check if everything works as expected by running the tests.
 
     bin/test
