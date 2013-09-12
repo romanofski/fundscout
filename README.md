@@ -25,3 +25,21 @@ Prerequites
 
     * Ghost.py (https://github.com/jeanphix/Ghost.py) > 0.1b2
     * PySide
+
+Development Sandbox
+-------------------
+
+Create a virtualenv first and use python2.7:
+
+    virtualenv ~/tools/python2.7
+    
+Install PySide in the virtualenv as outlined in the [pyside_setup guide](https://github.com/PySide/pyside-setup). Make sure you run the pyside_postinstall.py script after the installation if needed.
+
+Run the usual buildout procedure:
+
+    ~/tools/python2.7/bin/python bootstrap.py
+    bin/buildout -N
+    
+Check if everything works as expected by running the tests.
+
+    bin/test
