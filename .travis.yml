@@ -1,6 +1,8 @@
 language: python
 python:
     - "2.7"
+before_script:
+    - ln -s /usr/lib/python2.7/dist-packages/PySide /home/vagrant/virtualenv/python2.7/lib/python2.7/site-packages/PySide -v
 before_install:
     - sudo apt-get update
     - sudo apt-get -f install python-pyside
