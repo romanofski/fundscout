@@ -20,8 +20,10 @@ Furthermore I want an application which presents the data in such a way,
 that I can make informed decisions for future investments (however
 large or small they might be).
 
-Prerequites
------------
+Development Sandbox
+-------------------
+
+### Prerequites
 
 * Ghost.py (https://github.com/jeanphix/Ghost.py) > 0.1b2
 * PySide
@@ -30,8 +32,7 @@ Prerequites
       into errors that qmake can't be found, create a link to the
       executable: `sudo ln -s /usr/bin/qmake-qt4 /usr/bin/qmake`
 
-Development Sandbox
--------------------
+### Deployment
 
 Create a virtualenv first and use python2.7:
 
