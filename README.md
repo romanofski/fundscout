@@ -26,11 +26,7 @@ Development Sandbox
 ### Prerequites
 
 * Ghost.py (https://github.com/jeanphix/Ghost.py) > 0.1b2
-* PySide
-    - on Debian, install: `apt-get build-dep python-pyside`
-    - on Fedora, install: `yum-builddep python-pyside`. In case you run
-      into errors that qmake can't be found, create a link to the
-      executable: `sudo ln -s /usr/bin/qmake-qt4 /usr/bin/qmake`
+* PySide: install it with the instructions below.
 
 ### Deployment
 
