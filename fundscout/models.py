@@ -8,6 +8,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.orm
 import datetime
+import csv
 
 
 Base = declarative_base()
@@ -32,9 +33,40 @@ class ImportBatch(Base):
     import_date = Column(DateTime, default=datetime.datetime.utcnow,
                          nullable=False)
     bank_account_id = Column(Integer, ForeignKey('bankaccount.id'))
+    bank_account = sqlalchemy.orm.relationship(
+        'BankAccount', backref='importbatch')
 
     transactions = sqlalchemy.orm.relationship(
-        'FundTransaction', backref='importbatch')
+        'FundTransaction', backref='importbatch',
+        cascade='all, delete, delete-orphan')
+
+    @classmethod
+    def from_csv(klass, fp):
+        """ Creates transactions and a single import batch from csv
+            data.
+
+            Returns None if no transactions can be imported.
+        """
+        transactions = []
+        for row in csv.reader(fp):
+            if not row:
+                continue
+            try:
+                effective_date = datetime.datetime.strptime(row[0], '%d/%m/%Y')
+            except ValueError:
+                continue
+
+            tx = FundTransaction(description=row[-1],
+                                 amount=row[1],
+                                 effective=effective_date
+                                )
+            transactions.append(tx)
+
+        if not transactions:
+            return
+
+        batch = klass(transactions=transactions)
+        return batch
 
 
 class FundTransaction(Base):
@@ -59,20 +91,7 @@ class BankAccount(Base):
     currency = sqlalchemy.orm.relationship(
         'Currency', uselist=False, backref='bankaccount')
 
-    import_batches = sqlalchemy.orm.relationship(
-        'ImportBatch', backref='bankaccount')
-
-    def import_transactions(self, list_of_transactions):
-        """Wraps the list of transactions in an ImportBatch in order to
-           allow easy importing/rolling back of transactions.
-
-           Note: This should not be confused
-        """
-        batch = ImportBatch(transactions=list_of_transactions)
-        self.import_batches.append(batch)
-
-    def rollback_batch(self, batchid):
-        # TODO: Better lookup needed
-        for batch in self.import_batches:
-            if batchid == batch.id:
-                del self.import_batches[self.import_batches.index(batch)]
+    def rollback_batch(self, session, batchid):
+        batch = session.query(ImportBatch).filter_by(id = batchid).first()
+        if batch is not None:
+            session.delete(batch)

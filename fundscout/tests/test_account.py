@@ -1,6 +1,7 @@
 from fundscout.models import BankAccount
 from fundscout.models import Currency
 from fundscout.models import FundTransaction
+from fundscout.models import ImportBatch
 from fundscout.models import Session
 import datetime
 import fundscout
@@ -45,11 +46,17 @@ class TestAccountFunctional(unittest.TestCase):
             FundTransaction(description='second', amount=10.02,
                             effective=datetime.date.today()),
         ]
-        account.import_transactions(b1)
-        account.import_transactions(b2)
-        session.flush()
+        session.add(ImportBatch(bank_account=account, transactions=b1))
+        session.add(ImportBatch(bank_account=account, transactions=b2))
+        session.commit()
 
-        self.assertEqual(2, len(account.import_batches))
+        self.assertEqual(2, session.query(ImportBatch).count())
 
-        account.rollback_batch(2)
-        self.assertEqual(1, len(account.import_batches))
+        #
+        # now roll back the last set of transactions
+        #
+        account.rollback_batch(session, 2)
+        self.assertFalse(
+            session.query(FundTransaction).filter_by(description='second').first()
+        )
+        self.assertEqual(1, session.query(ImportBatch).count())
