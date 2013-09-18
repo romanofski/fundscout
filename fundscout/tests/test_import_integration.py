@@ -35,11 +35,20 @@ class TestImportCSV(unittest.TestCase):
 
     layer = SQLLayer
 
+    def setUp(self):
+        self.csvfile = os.path.join(os.path.dirname(__file__),
+                                    'testdata', 'anzexport.csv')
+
     def test_import_csv(self):
-        csvfile = os.path.join(os.path.dirname(__file__),
-                               'testdata', 'anzexport.csv')
-        import_csv(csvfile)
+        import_csv(self.csvfile)
 
         session = Session()
         self.assertEqual(1, session.query(ImportBatch).count())
         self.assertEqual(4, session.query(FundTransaction).count())
+
+    def test_avoid_duplicates(self):
+        import_csv(self.csvfile)
+        import_csv(self.csvfile)
+
+        session = Session()
+        self.assertEqual(1, session.query(ImportBatch).count())

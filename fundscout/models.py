@@ -41,7 +41,7 @@ class ImportBatch(Base):
         cascade='all, delete, delete-orphan')
 
     @classmethod
-    def from_csv(klass, fp):
+    def from_csv(klass, session, fp):
         """ Creates transactions and a single import batch from csv
             data.
 
@@ -55,12 +55,14 @@ class ImportBatch(Base):
                 effective_date = datetime.datetime.strptime(row[0], '%d/%m/%Y')
             except ValueError:
                 continue
-
-            tx = FundTransaction(description=row[-1],
-                                 amount=row[1],
-                                 effective=effective_date
-                                )
-            transactions.append(tx)
+            data = dict(description=row[-1],
+                        amount=row[1],
+                        effective=effective_date.date(),
+                       )
+            tx_count = session.query(FundTransaction).filter_by(**data).count()
+            if not tx_count:
+                tx = FundTransaction(**data)
+                transactions.append(tx)
 
         if not transactions:
             return

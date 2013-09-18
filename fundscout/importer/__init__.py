@@ -15,7 +15,8 @@ def import_csv(filepath, accountname='anz'):
                                                 isoname='AUD')
         )
     with open(filepath, 'r') as csvfile:
-        batch = ImportBatch.from_csv(csvfile)
-        batch.bank_account = bankaccount
-        session.add(batch)
-        session.commit()
+        batch = ImportBatch.from_csv(session, csvfile)
+        if batch is not None:
+            batch.bank_account = bankaccount
+            session.add(batch)
+    session.commit()
