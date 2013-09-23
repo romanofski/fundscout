@@ -44,7 +44,7 @@ class TestImportCSV(unittest.TestCase):
 
         session = Session()
         self.assertEqual(1, session.query(ImportBatch).count())
-        self.assertEqual(4, session.query(FundTransaction).count())
+        self.assertEqual(5, session.query(FundTransaction).count())
 
     def test_avoid_duplicates(self):
         import_csv(self.csvfile)
