@@ -28,7 +28,9 @@ class TestDownloadCSV(unittest.TestCase):
         browser = ghost.Ghost()
         for s in steps:
             result = s(browser)
-        assert 'foo,bar' in browser.content
+        page, resources = result
+        assert len(resources) == 1
+        assert 'foo,bar' in resources[0].content
 
 
 class TestImportCSV(unittest.TestCase):
