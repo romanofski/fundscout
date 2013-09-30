@@ -29,6 +29,7 @@ setup(
         'pysqlite',
         'sqlalchemy',
         'Ghost.py',
+        'pycountry',
     ],
     extras_require=dict(
         test=['mock',

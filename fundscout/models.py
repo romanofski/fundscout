@@ -6,24 +6,15 @@ from sqlalchemy import Date
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-import sqlalchemy.orm
-import datetime
 import csv
+import datetime
+import pycountry
 import re
+import sqlalchemy.orm
 
 
 Base = declarative_base()
 Session = sqlalchemy.orm.sessionmaker()
-
-
-class Currency(Base):
-    __tablename__ = 'currency'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    isoname = Column(String(3))
-
-    transaction_id = Column(Integer, ForeignKey('bankaccount.id'))
 
 
 class ImportBatch(Base):
@@ -91,8 +82,7 @@ class BankAccount(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     description = Column(String)
-    currency = sqlalchemy.orm.relationship(
-        'Currency', uselist=False, backref='bankaccount')
+    currency = Column(String)
 
     @sqlalchemy.orm.validates('name')
     def validate_name(self, key, name):
@@ -101,6 +91,12 @@ class BankAccount(Base):
         """
         assert re.match('[\d-]+', name), (
             "Valid account names should be account numbers! e.g.  12312-213123")
+        return name
+
+    @sqlalchemy.orm.validates('currency')
+    def validate_currency(self, key, name):
+        assert pycountry.currencies.get(letter=name), (
+            "Currency should be the iso letter, e.g. EUR, AUD, USD")
         return name
 
     def rollback_batch(self, session, batchid):

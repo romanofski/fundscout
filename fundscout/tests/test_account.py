@@ -1,5 +1,4 @@
 from fundscout.models import BankAccount
-from fundscout.models import Currency
 from fundscout.models import FundTransaction
 from fundscout.models import ImportBatch
 from fundscout.models import Session
@@ -13,21 +12,16 @@ class TestAccountFunctional(unittest.TestCase):
 
     layer = fundscout.testing.SQLLayer
 
-    def setUp(self):
-        session = Session()
-        session.add(Currency(name='Euro', isoname='EUR'))
-        session.flush()
-
     def test_create(self):
         session = Session()
         session.add(
             BankAccount(name='1231230-1', description='Test Description',
-                        currency=session.query(Currency).first())
+                        currency='AUD')
         )
 
         account = session.query(BankAccount).first()
         self.assertEqual('Test Description', account.description)
-        self.assertEqual('EUR', account.currency.isoname)
+        self.assertEqual('AUD', account.currency)
 
     def test_import_rollback_batch(self):
         session = Session()
@@ -37,7 +31,7 @@ class TestAccountFunctional(unittest.TestCase):
         # we figure out, that the last batch was faulty and revert it.
         #
         account = BankAccount(description='Test Description',
-                              currency=session.query(Currency).first())
+                              currency='EUR')
         b1 = [
             FundTransaction(description='first', amount=-2.30,
                             effective=datetime.date.today()),

@@ -1,5 +1,4 @@
 from fundscout.models import BankAccount
-from fundscout.models import Currency
 from fundscout.models import ImportBatch
 from fundscout.models import Session
 import csv
@@ -43,4 +42,4 @@ def guess_account_from_filename(session, filename):
 def create_bank_account(name, **kwargs):
     return BankAccount(name=name,
                        description=name,
-                       currency=Currency(name='Dollar', isoname='AUD'))
+                       currency='AUD')
