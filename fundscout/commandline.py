@@ -31,7 +31,7 @@ def _setup_commandline_arguments():
     parser.add_argument(
         "--list-accounts",
         help="Lists the accounts found in the database.",
-        action='store_false',
+        action='store_true',
     )
     parser.add_argument(
         "--config",
@@ -65,6 +65,7 @@ def client():
         fundscout.importer.config.configure_and_run(arguments.config)
 
     if arguments.csv and os.path.exists(arguments.csv):
-        fundscout.importer.import_csv(arguments.csv)
+        print '{} transactions imported.'.format(
+            fundscout.importer.import_csv(arguments.csv))
 
     sys.exit(0)
