@@ -32,11 +32,7 @@ def guess_account_from_filename(session, filename):
     """
     # TODO: we need some kind of fulltext search here
     name = os.path.splitext(os.path.basename(filename))[0].lower()
-    result = None
-    for ba in session.query(BankAccount).all():
-        if ba.name in name:
-            result = ba
-            break
+    result = session.query(BankAccount).filter_by(name=name).first()
     if result is None and name:
         result = create_bank_account(name)
         session.add(result)

@@ -21,7 +21,7 @@ class TestAccountFunctional(unittest.TestCase):
     def test_create(self):
         session = Session()
         session.add(
-            BankAccount(name='ANZ', description='Test Description',
+            BankAccount(name='1231230-1', description='Test Description',
                         currency=session.query(Currency).first())
         )
 

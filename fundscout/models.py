@@ -9,6 +9,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.orm
 import datetime
 import csv
+import re
 
 
 Base = declarative_base()
@@ -92,6 +93,15 @@ class BankAccount(Base):
     description = Column(String)
     currency = sqlalchemy.orm.relationship(
         'Currency', uselist=False, backref='bankaccount')
+
+    @sqlalchemy.orm.validates('name')
+    def validate_name(self, key, name):
+        """ Refuse any name which does not consist of numbers and a
+            dash.
+        """
+        assert re.match('[\d-]+', name), (
+            "Valid account names should be account numbers! e.g.  12312-213123")
+        return name
 
     def rollback_batch(self, session, batchid):
         batch = session.query(ImportBatch).filter_by(id = batchid).first()

@@ -18,14 +18,19 @@ class TestImporter(unittest.TestCase):
             def __init__(self, name):
                 self.name = name
 
-        accounts = [FakeAccount('foo'), FakeAccount('bar')]
+        account = FakeAccount('foo')
         session = mock.Mock()
-        session.query.return_value.all.return_value = accounts
+        session.query.return_value.filter_by.return_value.first.return_value = account
 
-        self.assertEqual(accounts[0],
-                         guess_account_from_filename(session, 'foo.frob.bar'))
-        self.assertEqual(accounts[0],
+        self.assertEqual(account,
+                         guess_account_from_filename(session, 'foo'))
+        self.assertEqual(account,
                          guess_account_from_filename(session, 'FOO'))
+
+    def test_guess_account_from_filename_no_existing_account(self):
+        session = mock.Mock()
+        session.query.return_value.filter_by.return_value.first.return_value = None
+
         self.assertIsNone(guess_account_from_filename(session, ''))
 
 
@@ -35,7 +40,7 @@ class TestImportCSV(unittest.TestCase):
 
     def setUp(self):
         self.csvfile = os.path.join(os.path.dirname(__file__),
-                                    'testdata', 'anzexport.csv')
+                                    'testdata', '123-123.csv')
         self.session = Session()
 
     def test_import_csv(self):
