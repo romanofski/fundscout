@@ -1,5 +1,6 @@
 from fundscout.models import Base
 from fundscout.models import Session
+from fundscout.models import BankAccount
 import argparse
 import fundscout
 import fundscout.importer.config
@@ -28,6 +29,11 @@ def _setup_commandline_arguments():
         default='sqlite:///' + os.path.join(os.path.abspath(os.getcwd()), 'fundscout.sqlite')
     )
     parser.add_argument(
+        "--list-accounts",
+        help="Lists the accounts found in the database.",
+        action='store_false',
+    )
+    parser.add_argument(
         "--config",
         help=("Path to configuration file for importing."),
         type=str
@@ -49,6 +55,11 @@ def client():
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     Session.configure(bind=engine)
+
+    if arguments.list_accounts:
+        session = Session()
+        names = [x.name for x in session.query(BankAccount).all()]
+        print '\n'.join(names)
 
     if arguments.config and os.path.exists(arguments.config):
         fundscout.importer.config.configure_and_run(arguments.config)
