@@ -73,7 +73,7 @@ class ImportBatch(Base):
 
 class FundTransaction(Base):
     """A simple transaction of funds."""
-    __tablename__ = 'transaction'
+    __tablename__ = 'fundtransaction'
 
     id = Column(Integer, primary_key=True)
     description = Column(String, nullable=False)
