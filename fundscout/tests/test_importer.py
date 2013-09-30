@@ -1,5 +1,13 @@
 from fundscout.importer import guess_account_from_filename
+from fundscout.importer import import_csv
+from fundscout.models import BankAccount
+from fundscout.models import Currency
+from fundscout.models import FundTransaction
+from fundscout.models import ImportBatch
+from fundscout.models import Session
+from fundscout.testing import SQLLayer
 import mock
+import os.path
 import unittest
 
 

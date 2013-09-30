@@ -1,15 +1,7 @@
-from fundscout.importer import import_csv
-from fundscout.models import BankAccount
-from fundscout.models import Currency
-from fundscout.models import FundTransaction
-from fundscout.models import ImportBatch
-from fundscout.models import Session
 from fundscout.testing import IntegrationLayer
-from fundscout.testing import SQLLayer
 import StringIO
 import fundscout.importer.config
 import ghost
-import os.path
 import unittest
 
 
@@ -35,29 +27,3 @@ class TestDownloadCSV(unittest.TestCase):
         assert 'foo,bar' in resources[0].content
 
 
-class TestImportCSV(unittest.TestCase):
-
-    layer = SQLLayer
-
-    def setUp(self):
-        self.csvfile = os.path.join(os.path.dirname(__file__),
-                                    'testdata', 'anzexport.csv')
-        self.session = Session()
-        self.session.add(
-            BankAccount(name='anz',
-                        description='anz account',
-                        currency=Currency(name='Dollar', isoname='AUD'))
-        )
-        self.session.flush()
-
-    def test_import_csv(self):
-        import_csv(self.csvfile)
-
-        self.assertEqual(1, self.session.query(ImportBatch).count())
-        self.assertEqual(5, self.session.query(FundTransaction).count())
-
-    def test_avoid_duplicates(self):
-        import_csv(self.csvfile)
-        import_csv(self.csvfile)
-
-        self.assertEqual(1, self.session.query(ImportBatch).count())
