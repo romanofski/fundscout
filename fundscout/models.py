@@ -117,6 +117,10 @@ class BankAccount(Base):
             "Currency should be the iso letter, e.g. EUR, AUD, USD")
         return name
 
+    @classmethod
+    def find_by_name(self, session, name):
+        return session.query(BankAccount).filter_by(name=name).first()
+
     def rollback_batch(self, session, batchid):
         batch = session.query(ImportBatch).filter_by(id = batchid).first()
         if batch is not None:

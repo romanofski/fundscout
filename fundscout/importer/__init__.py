@@ -6,10 +6,8 @@ import datetime
 import os.path
 
 
-def import_csv(filepath):
+def import_csv(session, filepath, bankaccount):
     tx_imported = 0
-    session = Session()
-    bankaccount = guess_account_from_filename(session, filepath)
     if bankaccount:
         with open(filepath, 'r') as csvfile:
             batch = ImportBatch.from_csv(session, csvfile)
@@ -21,25 +19,9 @@ def import_csv(filepath):
     return tx_imported
 
 
-def guess_account_from_filename(session, filename):
-    """Returns the account instance by using the filename without
+def guess_accountname_from_filename(filename):
+    """Returns the account name instance by using the filename without
        extension.
-
-       .. note:: If no bank account with guessed name can be found, a new one with
-       default values is created. This is subject to change in future
-       versions.
     """
     # TODO: we need some kind of fulltext search here
-    name = os.path.splitext(os.path.basename(filename))[0].lower()
-    result = session.query(BankAccount).filter_by(name=name).first()
-    if result is None and name:
-        result = create_bank_account(name)
-        session.add(result)
-        session.flush()
-    return result
-
-
-def create_bank_account(name, **kwargs):
-    return BankAccount(name=name,
-                       description=name,
-                       currency='AUD')
+    return os.path.splitext(os.path.basename(filename))[0].lower()
