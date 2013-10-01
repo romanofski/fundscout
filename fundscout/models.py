@@ -75,14 +75,32 @@ class FundTransaction(Base):
     import_batch_id = Column(Integer, ForeignKey('importbatch.id'))
 
 
+class Institute(Base):
+    """A user can have many accounts at an institute, like a bank.
+
+       This is needed to be able to look dependent import mechanisms for
+       each bank account.
+    """
+    __tablename__ = 'institute'
+
+    id = Column(Integer, primary_key=True)
+    shortname = Column(String, nullable=False)
+    title = Column(String)
+
+    bank_accounts = sqlalchemy.orm.relationship(
+        'BankAccount', backref='bankaccount')
+
+
 class BankAccount(Base):
     """A bank account"""
     __tablename__ = 'bankaccount'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, nullable=False)
     description = Column(String)
-    currency = Column(String)
+    currency = Column(String, nullable=False)
+
+    institute_id = Column(Integer, ForeignKey('institute.id'))
 
     @sqlalchemy.orm.validates('name')
     def validate_name(self, key, name):
